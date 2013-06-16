@@ -1,6 +1,7 @@
-var socket = io.connect('/');
+var chatInfra = io.connect('/chat_infra'),
+    chatCom = io.connect('/chat_com');
 
-socket.on('message', function (data) {
+chatCom.on('message', function (data) {
     data = JSON.parse(data);
     if(data.username) {
         $('#messages').append('<div class="'+data.type+
@@ -13,12 +14,12 @@ socket.on('message', function (data) {
     }
 });
 
-socket.on('name_set', function(data) {
+chatInfra.on('name_set', function(data) {
     $('#nameform').hide();
     $('#messages').append('<div class="systemMessage">' + 'Hello '+data.name+'</div>');
 });
 
-socket.on("user_entered", function(user) {
+chatInfra.on("user_entered", function(user) {
     $('#messages').append('<div class="systemMessage">' + user.name
         + ' has joined the room.' + '</div>');
 });
@@ -29,11 +30,11 @@ $(function(){
             message: $('#message').val(),
             type:'userMessage'
         };
-        socket.send(JSON.stringify(data));
+        chatCom.send(JSON.stringify(data));
         $('#message').val('');
     });
 
     $('#setname').click(function(){
-        socket.emit("set_name", {name: $('#nickname').val()});
+        chatInfra.emit("set_name", {name: $('#nickname').val()});
     });
 });
