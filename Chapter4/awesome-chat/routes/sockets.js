@@ -19,6 +19,7 @@ exports.initialize = function(server) {
                 socket.emit('name_set', data);
                 socket.send(JSON.stringify({type:'serverMessage',
                     message: 'Welcome to the most interesting chat room on earth!'}));
+                socket.broadcast.emit('user_entered', data);
             });
         });
     });

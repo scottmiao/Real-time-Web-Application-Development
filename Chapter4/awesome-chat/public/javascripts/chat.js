@@ -18,6 +18,11 @@ socket.on('name_set', function(data) {
     $('#messages').append('<div class="systemMessage">' + 'Hello '+data.name+'</div>');
 });
 
+socket.on("user_entered", function(user) {
+    $('#messages').append('<div class="systemMessage">' + user.name
+        + ' has joined the room.' + '</div>');
+});
+
 $(function(){
     $('#send').click(function(){
         var data = {
