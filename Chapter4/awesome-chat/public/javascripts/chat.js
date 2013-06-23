@@ -5,8 +5,10 @@ var roomName = decodeURI(
     (RegExp("room" + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1]);
 
 if (roomName) {
+    chatInfra.emit('join_room', {'name':roomName});
+
     chatInfra.on('name_set', function(data) {
-        chatInfra.emit('join_room', {'name':roomName});
+        // chatInfra.emit('join_room', {'name':roomName});
         $('#nameform').hide();
         $('#messages').append('<div class="systemMessage">' + 'Hello '+data.name+'</div>');
     });

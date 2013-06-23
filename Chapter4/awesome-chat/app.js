@@ -7,9 +7,12 @@
  , routes = require('./routes')
  , user = require('./routes/user')
  , http = require('http')
- , path = require('path');
+ , path = require('path')
+ , connect = require('connect');
 
  var app = express();
+
+ var sessionStore = new connect.session.MemoryStore();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -18,6 +21,8 @@ app.set('view engine', 'jade');
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
+app.use(express.cookieParser('somesuperspecialsecrethere'));
+app.use(express.session({ key: 'express.sid', store: sessionStore}));
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));

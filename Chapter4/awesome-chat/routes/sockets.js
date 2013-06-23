@@ -2,6 +2,18 @@ var io = require('socket.io');
 
 exports.initialize = function(server) {
     io = io.listen(server);
+
+    io.set('authorization', function (data, accept) {
+        if (data.headers.cookie) {
+            data.cookie = require('cookie').parse(data.headers.cookie);
+            data.sessionID = data.cookie['express.sid'].split('.')[0];
+            data.nickname = data.cookie['nickname'];
+        } else {
+            return accept('No cookie transmitted.', false);
+        }
+        accept(null, true);
+    });
+
     var self = this;
 
     this.chatInfra = io.of("/chat_infra");
@@ -15,7 +27,12 @@ exports.initialize = function(server) {
             });
         });
         socket.on("join_room", function (room) {
-            socket.get('nickname', function (err, nickname) {
+            var nickname = socket.handshake.nickname;
+            socket.set('nickname', nickname, function () {
+                socket.emit('name_set', {'name': socket.handshake.nickname});
+                socket.send(JSON.stringify({
+                    type:'serverMessage',
+                    message:'Welcome to the most interesting ' + 'chat room on earth!'}));
                 socket.join(room.name);
                 var comSocket = self.chatCom.sockets[socket.id];
                 comSocket.join(room.name);
